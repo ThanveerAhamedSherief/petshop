@@ -26,10 +26,10 @@ exports.registerUser = async (req, res) => {
       latitude,
       longtitude,
     } = req.body;
-    console.log("files==>", req.file)
+    console.log("files==>", req.files)
     let fileInfo;
     let avatar;
-    if (req.files) {
+    if (req.files != undefined) {
       const avatarLocalPath = req.files?.avatar[0]?.path;
       avatar = await uploadOnCloudinary(avatarLocalPath);
     }
