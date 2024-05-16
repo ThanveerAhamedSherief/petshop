@@ -29,10 +29,10 @@ exports.registerUser = async (req, res) => {
     console.log("files==>", req.files)
     let fileInfo;
     let avatar;
-    if (req.files != undefined) {
-      const avatarLocalPath = req.files?.avatar[0]?.path;
-      avatar = await uploadOnCloudinary(avatarLocalPath);
-    }
+    // if (req.files != undefined) {
+    //   const avatarLocalPath = req.files?.avatar[0]?.path;
+    //   avatar = await uploadOnCloudinary(avatarLocalPath);
+    // }
     //  avatar = await uploadOnCloudinary(avatarLocalPath);
 
    
