@@ -95,7 +95,7 @@ exports.findUser = async (req, res) => {
             ...userExist._doc,
             token: await userExist.generateToken()
         } : null;
-        
+        console.log("data", data)
         res.status(200).json(customizeResponse(
             true,
             "User Fetch Api Successfull",
@@ -103,6 +103,7 @@ exports.findUser = async (req, res) => {
         ))
         
     } catch (error) {
+      console.log("Error", error)
         res.status(500).json({
             msg: "Error in Login",
             error
