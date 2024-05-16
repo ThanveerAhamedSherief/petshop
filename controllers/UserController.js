@@ -29,10 +29,11 @@ exports.registerUser = async (req, res) => {
     console.log("files==>", req.file)
     let fileInfo;
     const avatarLocalPath = req.files?.avatar[0]?.path;
-    if (!avatarLocalPath) {
-        throw new ApiError(400, "Avatar file is required")
+    let avatar;
+    if (req.files) {
+      avatar = await uploadOnCloudinary(avatarLocalPath);
     }
-    const avatar = await uploadOnCloudinary(avatarLocalPath);
+    //  avatar = await uploadOnCloudinary(avatarLocalPath);
 
    
     if (!(email && password && name)) {
@@ -47,7 +48,7 @@ exports.registerUser = async (req, res) => {
         .json(customizeResponse(false, "User already exists"));
     }
     
-    console.log("fileInfo", avatar.url);
+    // console.log("fileInfo", avatar.url);
     const createUser = await User.create({
         name,
       email,
@@ -61,7 +62,7 @@ exports.registerUser = async (req, res) => {
       pincode,
       latitude,
       longtitude,
-      profilePic: avatar.url
+      profilePic: avatar?.url ? avatar.url : ""
     });
     let token = await createUser.generateToken();
     console.log("Token==>", token);
@@ -75,6 +76,7 @@ exports.registerUser = async (req, res) => {
       .status(201)
       .json(customizeResponse(true, "New user created successfully", response));
   } catch (error) {
+    console.log("Error from register", error)
     logger.error("Error while registering a user", error);
     res
       .status(400)
