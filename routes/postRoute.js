@@ -14,6 +14,9 @@ postRouter.route('/:ownerId/createPost').post(
     ]),
     createPost
     );
+    
+postRouter.route('/getNearByPosts').get(findNearBy)
+
 
 
 module.exports = postRouter;

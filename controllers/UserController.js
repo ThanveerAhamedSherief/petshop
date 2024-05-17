@@ -5,10 +5,8 @@ const { customizeResponse } = require("../utils/customResponse");
 const logger = require("../utils/logGenerator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const fs = require('fs');
+const fs = require("fs");
 const { uploadOnCloudinary } = require("../utils/cloudinary");
-
-
 
 exports.registerUser = async (req, res) => {
   try {
@@ -26,16 +24,14 @@ exports.registerUser = async (req, res) => {
       latitude,
       longtitude,
     } = req.body;
-    console.log("files==>", req.files)
-    let fileInfo;
+    console.log("files==>", req.file);
     let avatar;
-    // if (req.files != undefined) {
-    //   const avatarLocalPath = req.files?.avatar[0]?.path;
-    //   avatar = await uploadOnCloudinary(avatarLocalPath);
-    // }
+    if (req.file) {
+      const avatarLocalPath = req.file.path;
+      avatar = await uploadOnCloudinary(avatarLocalPath);
+    }
     //  avatar = await uploadOnCloudinary(avatarLocalPath);
 
-   
     if (!(email && password && name)) {
       return res
         .status(401)
@@ -45,12 +41,11 @@ exports.registerUser = async (req, res) => {
     if (isExistingUser) {
       return res
         .status(401)
-        .json(customizeResponse(false, "User already exists"));
+        .json(customizeResponse(false, "User already exists", []));
     }
-    
-    // console.log("fileInfo", avatar.url);
+
     const createUser = await User.create({
-        name,
+      name,
       email,
       password,
       gender,
@@ -62,7 +57,7 @@ exports.registerUser = async (req, res) => {
       pincode,
       latitude,
       longtitude,
-      profilePic: avatar?.url ? avatar.url : ""
+      profilePic: avatar?.url ? avatar.url : "",
     });
     let token = await createUser.generateToken();
     console.log("Token==>", token);
@@ -76,7 +71,7 @@ exports.registerUser = async (req, res) => {
       .status(201)
       .json(customizeResponse(true, "New user created successfully", response));
   } catch (error) {
-    console.log("Error from register", error)
+    console.log("Error from register", error);
     logger.error("Error while registering a user", error);
     res
       .status(400)
@@ -85,34 +80,31 @@ exports.registerUser = async (req, res) => {
 };
 
 exports.findUser = async (req, res) => {
-    try {
-        let { email } = req.params;
-        console.log("Params",req.params)
-        let userExist = await User.findOne({ email });
+  try {
+    let { email } = req.params;
+    console.log("Params", req.params);
+    let userExist = await User.findOne({ email });
 
-        if(!userExist) {
-            return res.status(400).json({msg: "Invalid credentials"})
-        };
-        let data = userExist ? {
-            ...userExist._doc,
-            token: await userExist.generateToken()
-        } : null;
-        console.log("data", data)
-        res.status(200).json(customizeResponse(
-            true,
-            "User Fetch Api Successfull",
-            data
-        ))
-        
-    } catch (error) {
-      console.log("Error", error)
-        res.status(500).json({
-            msg: "Error in Login",
-            error
-        });
+    if (!userExist) {
+      return res
+      .status(400)
+      .json(customizeResponse(false, "User doesn't exists", []));
     }
-}
-
-
-
-
+    let data = userExist
+      ? {
+          ...userExist._doc,
+          token: await userExist.generateToken(),
+        }
+      : null;
+    console.log("data", data);
+    res
+      .status(200)
+      .json(customizeResponse(true, "User Fetch Api Successfull", data));
+  } catch (error) {
+    console.log("Error", error);
+    res.status(500).json({
+      msg: "Error in Login",
+      error,
+    });
+  }
+};

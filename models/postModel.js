@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
-
+const mogooseAggresgate = require('mongoose-aggregate-paginate-v2')
 const postSchema = new Schema({
     ownerId:{
         type: Schema.Types.ObjectId,
@@ -57,11 +57,17 @@ const postSchema = new Schema({
         type: Boolean,
         default: false
     },
-    latitude: Number,
-    longtitude: Number,
+    location:{
+        
+            type: { type: String },
+            coordinates: [Number],
+        
+    },
     pincode: Number
 },{
     timestamps: true
 });
+postSchema.plugin(mogooseAggresgate);
+postSchema.index(({location: "2dsphere"}))
 
 exports.postModel = mongoose.model('post', postSchema);
