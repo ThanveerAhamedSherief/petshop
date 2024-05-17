@@ -1,7 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const multer = require('multer');
-const Grid = require('gridfs-stream');
 const path = require('path');
 const crypto = require('crypto');
 

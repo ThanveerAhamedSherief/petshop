@@ -1,7 +1,6 @@
 const { mongourl } = require("../config/config");
 const logger = require("../utils/logGenerator");
 const mongoose = require("mongoose");
-const Grid = require('gridfs-stream');
 
 let gfs1;
 let conn;
