@@ -1,5 +1,5 @@
 const express = require("express");
-const { registerUser, findUser } = require("../controllers/UserController");
+const { registerUser, findUser, fetchUserProfile } = require("../controllers/UserController");
 const { upload } = require("../services/imageUploader");
 const userRouter = express.Router();
 
@@ -17,5 +17,6 @@ userRouter.get("/", (req, res) => {
 //     );
 userRouter.route("/register").post(upload.single("avatar"), registerUser);
 userRouter.get("/details/:email", findUser);
+userRouter.route('/:userId/getUserProfile').get(fetchUserProfile);
 
 module.exports = userRouter;

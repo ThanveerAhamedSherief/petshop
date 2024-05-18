@@ -88,7 +88,7 @@ exports.findUser = async (req, res) => {
     if (!userExist) {
       return res
       .status(400)
-      .json(customizeResponse(false, "User doesn't exists", []));
+      .json(customizeResponse(false, "User doesn't exists", null));
     }
     let data = userExist
       ? {
@@ -108,3 +108,22 @@ exports.findUser = async (req, res) => {
     });
   }
 };
+
+exports.fetchUserProfile = async (req, res) => {
+  try {
+    let { userId} = req.params;
+    console.log("userId", userId)
+    let fetchedUserDetails = await User.findById(userId).populate('posts')
+
+    res
+    .status(201)
+    .json(customizeResponse(true, "Fetched user details successfully", fetchedUserDetails));
+
+  } catch (error) {
+    console.log("Error from fetchUserProfile", error);
+    logger.error("Error while fetchUserProfile", error);
+    res
+      .status(500)
+      .json(customizeResponse(false, "Error while fetchUserProfile", error));
+  }
+}

@@ -7,6 +7,7 @@ const cors = require("cors");
 const path = require('path');
 const userRouter = require("./routes/userRoutes");
 const postRouter = require("./routes/postRoute");
+const adminRouter = require("./routes/adminRoute");
 
 const startServer = () => {
   server.use(cors());
@@ -15,6 +16,7 @@ const startServer = () => {
 
   server.use('/api/v1/user', userRouter);
   server.use('/api/v1/post', postRouter);
+  server.use('/api/v1/admin', adminRouter)
 
   server.listen(port, async () => {
     console.log(`Server started at ${port}...!`);

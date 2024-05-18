@@ -1,73 +1,74 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 const { Schema } = mongoose;
-const mogooseAggresgate = require('mongoose-aggregate-paginate-v2')
-const postSchema = new Schema({
-    ownerId:{
-        type: Schema.Types.ObjectId,
-        ref: 'User'
+const mogooseAggresgate = require("mongoose-aggregate-paginate-v2");
+const postSchema = new Schema(
+  {
+    ownerId: {
+      type: Schema.Types.ObjectId,
+      ref: "user",
     },
-    petName:{
-        type: String
+    petName: {
+      type: String,
     },
-    breedName:{
-        type: String
+    breedName: {
+      type: String,
     },
     Adoption: {
-        type: String
+      type: String,
     },
-    city:{
-        type: String
+    city: {
+      type: String,
     },
-    state:{
-        type: String
+    state: {
+      type: String,
     },
-    country:{
-        type: String
+    country: {
+      type: String,
     },
-    petGender:{
-        type: String
+    petGender: {
+      type: String,
     },
     petDob: {
-        type: Date
+      type: Date,
     },
     petColor: {
-        type: String
+      type: String,
     },
     petType: {
-        type: String
+      type: String,
     },
-    Description:{
-        type: String
+    Description: {
+      type: String,
     },
-    weight:{
-        type: Number
+    weight: {
+      type: Number,
     },
     price: {
-        type: Number,
-        default:0
+      type: Number,
+      default: 0,
     },
     whatsAppNumber: {
-        type: Number
+      type: Number,
     },
-    petImages:{
-        type: Array,
-        default: []
+    petImages: {
+      type: Array,
+      default: [],
     },
-    isPublicEnabled: {
-        type: Boolean,
-        default: false
+    status: {
+      type: String,
+      default: "Draft",
     },
-    location:{
-        
-            type: { type: String },
-            coordinates: [Number],
-        
+    location: {
+      type: { type: String },
+      coordinates: [Number],
     },
-    pincode: Number
-},{
-    timestamps: true
-});
+    pincode: Number,
+  },
+  {
+    timestamps: true,
+  }
+);
 postSchema.plugin(mogooseAggresgate);
-postSchema.index(({location: "2dsphere"}))
+postSchema.index({ location: "2dsphere" });
 
-exports.postModel = mongoose.model('post', postSchema);
+exports.postModel = mongoose.model("post", postSchema);

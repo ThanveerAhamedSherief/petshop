@@ -53,6 +53,9 @@ exports.createPost = async (req, res) => {
       location,
       city,
     });
+    await User.updateOne({_id:ownerId},{
+        $push: {posts:createUser._id}
+    })
     res.status(201).json(customizeResponse(true, "Post created", createUser));
   } catch (error) {
     logger.error("Error while registering a user", error);
@@ -68,6 +71,7 @@ exports.findNearBy = async (req, res) => {
 
     async function findNearbyLocations(latitude, longtitude) {
       let locations = await postModel.aggregate([
+       
         {
           $geoNear: {
             near: { type: "Point", coordinates: [longtitude, latitude] },
@@ -78,8 +82,13 @@ exports.findNearBy = async (req, res) => {
           },
         },
         {
+          $match:{
+            status: "Approved"
+          }
+        },
+        {
           $addFields: {
-            "dist.calculated": { $divide: ["$dist.calculated", 1000] }, // Convert meters to kilometers
+            "dist.calculated": { $toInt: {$divide: ["$dist.calculated", 1000]} }, // Convert meters to kilometers
           },
         },
       ]);

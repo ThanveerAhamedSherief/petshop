@@ -47,16 +47,23 @@ const userSchema = new Schema(
     longtitude: {
       type: Number,
     },
-    isAdmin: {
+    role: {
         type: String,
         default: 'user'
     },
     profilePic: {
         type: String
     },
+    dob:{
+      type: Number
+    },
     posts: {
-        type: Schema.Types.ObjectId,
-        ref: "Post"
+        type: [Schema.Types.ObjectId],
+        ref: "post"
+    },
+    userType:{
+      type: String,
+      required: true
     }
   },
   {
