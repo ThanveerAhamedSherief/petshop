@@ -1,4 +1,4 @@
-const { secretkey } = require("../config/config");
+const { secretkey, limit } = require("../config/config");
 const { gfs } = require("../db/connection");
 const { User } = require("../models/userModel");
 const { customizeResponse } = require("../utils/customResponse");
@@ -53,9 +53,12 @@ exports.createPost = async (req, res) => {
       location,
       city,
     });
-    await User.updateOne({_id:ownerId},{
-        $push: {posts:createUser._id}
-    })
+    await User.updateOne(
+      { _id: ownerId },
+      {
+        $push: { posts: createUser._id },
+      }
+    );
     res.status(201).json(customizeResponse(true, "Post created", createUser));
   } catch (error) {
     logger.error("Error while registering a user", error);
@@ -67,33 +70,56 @@ exports.createPost = async (req, res) => {
 
 exports.findNearBy = async (req, res) => {
   try {
-    let { lat, lang } = req.query;
+    let { lat, lang, page, petType } = req.query;
 
-    async function findNearbyLocations(latitude, longtitude) {
-      let locations = await postModel.aggregate([
-       
-        {
-          $geoNear: {
-            near: { type: "Point", coordinates: [longtitude, latitude] },
-            key: "location",
-            maxDistance: 500000, //parseFloat(500) * 1609,
-            distanceField: "dist.calculated",
-            spherical: true,
-          },
+    console.log("petType", petType)
+
+    let isTypeAvailable = (petType !== undefined && petType !== "") ? true : false;
+
+    console.log("isTypeAvailable", isTypeAvailable)
+
+async function findNearbyLocations(latitude, longitude) {
+  let locations = await postModel.aggregate([
+    {
+      $geoNear: {
+        near: { type: "Point", coordinates: [longitude, latitude] },
+        key: "location",
+        maxDistance: 500000, // 500 kilometers in meters
+        distanceField: "dist.calculated",
+        spherical: true,
+      },
+    },
+    {
+      $match: {
+        status: "Draft",
+        ...(isTypeAvailable && { petType }),
+      },
+    },
+    {
+      $addFields: {
+        "dist.calculated": {
+          $toInt: { $divide: ["$dist.calculated", 1000] }, // Convert meters to kilometers
         },
-        {
-          $match:{
-            status: "Approved"
-          }
-        },
-        {
-          $addFields: {
-            "dist.calculated": { $toInt: {$divide: ["$dist.calculated", 1000]} }, // Convert meters to kilometers
-          },
-        },
-      ]);
-      return locations;
-    }
+      },
+    },
+    {
+      $skip: (parseInt(page) - 1) * parseInt(limit),
+    },
+    {
+      $limit: parseInt(limit),
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "ownerId",
+        foreignField: "_id",
+        as: "postedUser",
+      },
+    },
+  ]);
+  
+  return locations;
+}
 
     console.log(parseFloat(lang), parseFloat(lat));
     findNearbyLocations(parseFloat(lat), parseFloat(lang))

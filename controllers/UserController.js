@@ -1,4 +1,4 @@
-const { secretkey } = require("../config/config");
+const { secretkey, limit } = require("../config/config");
 const { gfs } = require("../db/connection");
 const { User } = require("../models/userModel");
 const { customizeResponse } = require("../utils/customResponse");
@@ -7,6 +7,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const { uploadOnCloudinary } = require("../utils/cloudinary");
+const { postModel } = require("../models/postModel");
 
 exports.registerUser = async (req, res) => {
   try {
@@ -23,6 +24,8 @@ exports.registerUser = async (req, res) => {
       pincode,
       latitude,
       longtitude,
+      dob,
+      userType,
     } = req.body;
     console.log("files==>", req.file);
     let avatar;
@@ -58,6 +61,8 @@ exports.registerUser = async (req, res) => {
       latitude,
       longtitude,
       profilePic: avatar?.url ? avatar.url : "",
+      dob,
+      userType,
     });
     let token = await createUser.generateToken();
     console.log("Token==>", token);
@@ -65,7 +70,7 @@ exports.registerUser = async (req, res) => {
       email: createUser.email,
       name: createUser.name,
       id: createUser.id,
-      token
+      token,
     };
     res
       .status(201)
@@ -87,8 +92,8 @@ exports.findUser = async (req, res) => {
 
     if (!userExist) {
       return res
-      .status(400)
-      .json(customizeResponse(false, "User doesn't exists", null));
+        .status(200)
+        .json(customizeResponse(false, "User doesn't exists", null));
     }
     let data = userExist
       ? {
@@ -109,16 +114,26 @@ exports.findUser = async (req, res) => {
   }
 };
 
-exports.fetchUserProfile = async (req, res) => {
+exports.fetchUserPosts = async (req, res) => {
   try {
-    let { userId} = req.params;
-    console.log("userId", userId)
-    let fetchedUserDetails = await User.findById(userId).populate('posts')
+    let { userId } = req.params;
+    let {page, status} = req.query;
+    let isStatusAvailable = (status !== undefined && status !== "") ? true : false;
+    console.log("userId", userId);
+    let fetchedUserDetails = await postModel
+      .find({ ownerId: userId, ...(isStatusAvailable && {status}) })
+      .limit(limit)
+      .skip(parseInt(page - 1) * limit);
 
     res
-    .status(201)
-    .json(customizeResponse(true, "Fetched user details successfully", fetchedUserDetails));
-
+      .status(200)
+      .json(
+        customizeResponse(
+          true,
+          "Fetched user details successfully",
+          fetchedUserDetails
+        )
+      );
   } catch (error) {
     console.log("Error from fetchUserProfile", error);
     logger.error("Error while fetchUserProfile", error);
@@ -126,4 +141,4 @@ exports.fetchUserProfile = async (req, res) => {
       .status(500)
       .json(customizeResponse(false, "Error while fetchUserProfile", error));
   }
-}
+};

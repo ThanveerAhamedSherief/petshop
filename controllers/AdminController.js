@@ -1,3 +1,4 @@
+const { limit } = require("../config/config");
 const { postModel } = require("../models/postModel");
 const { customizeResponse } = require("../utils/customResponse");
 const logger = require("../utils/logGenerator");
@@ -29,7 +30,9 @@ const enablePostsToPublic = async (req, res) => {
 
 const getCreatedPosts = async (req, res) => {
   try {
-    let posts = await postModel.find({ status: "Draft" });
+    let { page } = req.query;
+    page = parseInt(page)
+    let posts = await postModel.find({ status: "Draft" }).limit(limit).skip((page - 1) * limit);
     // console.log("posts", posts);
     res
       .status(200)
