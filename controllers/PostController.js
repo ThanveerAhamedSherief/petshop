@@ -24,7 +24,6 @@ exports.createPost = async (req, res) => {
       weight,
       price,
       whatsAppNumber,
-      location,
       city,
     } = req.body;
     const { ownerId } = req.params;
@@ -34,6 +33,13 @@ exports.createPost = async (req, res) => {
     if (avatarLocalPath) {
       images = await uploadOnCloudinary(avatarLocalPath);
     }
+    let user = await User.findById(ownerId);
+    let location = user
+      ? {
+          type: "Point",
+          coordinates: [user.longtitude, user.latitude],
+        }
+      : {};
     // location = JSON.parse(location)
     const createUser = await postModel.create({
       ownerId,
@@ -51,6 +57,7 @@ exports.createPost = async (req, res) => {
       whatsAppNumber,
       petImages: images,
       location,
+      createdOn: Date.now(),
       city,
     });
     await User.updateOne(
@@ -72,54 +79,55 @@ exports.findNearBy = async (req, res) => {
   try {
     let { lat, lang, page, petType } = req.query;
 
-    console.log("petType", petType)
+    console.log("petType", petType);
 
-    let isTypeAvailable = (petType !== undefined && petType !== "") ? true : false;
+    let isTypeAvailable =
+      petType !== undefined && petType !== "" ? true : false;
 
-    console.log("isTypeAvailable", isTypeAvailable)
+    console.log("isTypeAvailable", isTypeAvailable);
 
-async function findNearbyLocations(latitude, longitude) {
-  let locations = await postModel.aggregate([
-    {
-      $geoNear: {
-        near: { type: "Point", coordinates: [longitude, latitude] },
-        key: "location",
-        maxDistance: 500000, // 500 kilometers in meters
-        distanceField: "dist.calculated",
-        spherical: true,
-      },
-    },
-    {
-      $match: {
-        status: "Draft",
-        ...(isTypeAvailable && { petType }),
-      },
-    },
-    {
-      $addFields: {
-        "dist.calculated": {
-          $toInt: { $divide: ["$dist.calculated", 1000] }, // Convert meters to kilometers
+    async function findNearbyLocations(latitude, longitude) {
+      let locations = await postModel.aggregate([
+        {
+          $geoNear: {
+            near: { type: "Point", coordinates: [longitude, latitude] },
+            key: "location",
+            maxDistance: 500000, // 500 kilometers in meters
+            distanceField: "dist.calculated",
+            spherical: true,
+          },
         },
-      },
-    },
-    {
-      $skip: (parseInt(page) - 1) * parseInt(limit),
-    },
-    {
-      $limit: parseInt(limit),
-    },
-    {
-      $lookup: {
-        from: "users",
-        localField: "ownerId",
-        foreignField: "_id",
-        as: "postedUser",
-      },
-    },
-  ]);
-  
-  return locations;
-}
+        {
+          $match: {
+            status: "Approved", 
+            ...(isTypeAvailable && { petType }),
+          },
+        },
+        {
+          $addFields: {
+            "dist.calculated": {
+              $toInt: { $divide: ["$dist.calculated", 1000] }, // Convert meters to kilometers
+            },
+          },
+        },
+        {
+          $skip: (parseInt(page) - 1) * parseInt(limit),
+        },
+        {
+          $limit: parseInt(limit),
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "ownerId",
+            foreignField: "_id",
+            as: "postedUser",
+          },
+        },
+      ]);
+
+      return locations;
+    }
 
     console.log(parseFloat(lang), parseFloat(lat));
     findNearbyLocations(parseFloat(lat), parseFloat(lang))

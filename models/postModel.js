@@ -63,6 +63,8 @@ const postSchema = new Schema(
       coordinates: [Number],
     },
     pincode: Number,
+    createdOn: Date,
+    updatedOn: Date
   },
   {
     timestamps: true,
