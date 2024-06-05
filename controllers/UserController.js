@@ -6,7 +6,7 @@ const logger = require("../utils/logGenerator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
-const { uploadOnCloudinary } = require("../utils/cloudinary");
+const { uploadOnCloudinary, deleteOnCloudinary } = require("../utils/cloudinary");
 const { postModel } = require("../models/postModel");
 
 exports.registerUser = async (req, res) => {
@@ -69,7 +69,7 @@ exports.registerUser = async (req, res) => {
     let response = {
       email: createUser.email,
       name: createUser.name,
-      id: createUser.id,
+      _id: createUser.id,
       token,
     };
     res
@@ -142,3 +142,57 @@ exports.fetchUserPosts = async (req, res) => {
       .json(customizeResponse(false, "Error while fetchUserProfile", error));
   }
 };
+
+exports.fetchAllUser = async (req, res) => {
+  try {
+    let {page} = req.query;
+    let fetchedUserDetails = await User
+      .find()
+      .limit(limit)
+      .skip(parseInt(page - 1) * limit);
+
+    res
+      .status(200)
+      .json(
+        customizeResponse(
+          true,
+          "Fetched All user",
+          fetchedUserDetails
+        )
+      );
+  } catch (error) {
+    console.log("Error from all user fetch", error);
+    logger.error("Error from all user fetch", error);
+    res
+      .status(500)
+      .json(customizeResponse(false, "Error from all user fetch", error));
+  }
+};
+
+exports.updateUser = async (req, res) => {
+  try {
+    let { userId } = req.params;
+    console.log("userId id from params", userId)
+    console.log("files==>", req.file);
+    let avatar;
+    if (req.file) {
+      const avatarLocalPath = req.file.path;
+      avatar = await uploadOnCloudinary(avatarLocalPath);
+    }
+    if(req.file && avatar?.url) {
+      req.body.profilePic = avatar?.url;
+    }
+    let updatedUser = await User.findByIdAndUpdate(userId, req.body, { new: true} );
+    res.status(200).json(customizeResponse(true, "User updated successfully", updatedUser));
+  } catch (error) {
+    logger.error("Error while updating the user:", error);
+    res
+      .status(500)
+      .json(customizeResponse(false, "Error while updating the user", error));
+  }
+};
+
+
+
+
+

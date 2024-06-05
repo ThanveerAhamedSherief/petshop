@@ -1,6 +1,7 @@
 const express = require("express");
-const { registerUser, findUser, fetchUserPosts } = require("../controllers/UserController");
+const { registerUser, findUser, fetchUserPosts, updateUser } = require("../controllers/UserController");
 const { upload } = require("../services/imageUploader");
+const { authenticateUserToken } = require("../services/authMiddleware");
 const userRouter = express.Router();
 
 userRouter.get("/", (req, res) => {
@@ -18,5 +19,9 @@ userRouter.get("/", (req, res) => {
 userRouter.route("/register").post(upload.single("avatar"), registerUser);
 userRouter.get("/details/:email", findUser);
 userRouter.route('/:userId/getUserProfile').get(fetchUserPosts);
+userRouter.route('/:userId/updateProfile').put(upload.single("avatar"), updateUser);
+// userRouter.route("/register").post(upload.single("avatar"), registerUser);
+// userRouter.get("/details/:email", findUser);
+// userRouter.route('/:userId/getUserProfile').get(authenticateUserToken, fetchUserPosts);
 
 module.exports = userRouter;

@@ -6,7 +6,7 @@ const logger = require("../utils/logGenerator");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
-const { uploadOnCloudinary } = require("../utils/cloudinary");
+const { uploadOnCloudinary, deleteOnCloudinary } = require("../utils/cloudinary");
 const { postModel } = require("../models/postModel");
 
 exports.createPost = async (req, res) => {
@@ -68,10 +68,10 @@ exports.createPost = async (req, res) => {
     );
     res.status(201).json(customizeResponse(true, "Post created", createUser));
   } catch (error) {
-    logger.error("Error while registering a user", error);
+    logger.error("Error while creating post ", error);
     res
       .status(500)
-      .json(customizeResponse(false, "Error while registering an user", error));
+      .json(customizeResponse(false, "Error while creating post", error));
   }
 };
 
@@ -146,3 +146,72 @@ exports.findNearBy = async (req, res) => {
       .json(customizeResponse(false, "Error finding nearby locations:", error));
   }
 };
+
+exports.updatePosts = async (req, res) => {
+  try {
+    let { postId } = req.params;
+    const avatarLocalPath = req.files?.images;
+    let images = [];
+    if (avatarLocalPath) {
+      images = await uploadOnCloudinary(avatarLocalPath);
+    }
+    if(req.files && images.length > 0) {
+      req.body.petImages = images;
+    }
+    console.log("Post id from params", postId)
+    let updatedPosts = await postModel.findByIdAndUpdate(postId, req.body, { new: true} );
+    res.status(200).json(customizeResponse(true, "Post updated successfully", updatedPosts));
+  } catch (error) {
+    logger.error("Error while updating the posts:", error);
+    res
+      .status(500)
+      .json(customizeResponse(false, "Error while updating the posts", error));
+  }
+};
+
+exports.deleteImages = async (req, res) => {
+  try {
+    let { postId} = req.params;
+    let {imageUrl} = req.body;
+    await deleteOnCloudinary(imageUrl);
+
+    let post = await postModel.findById(postId);
+    let filteredPost;
+    if(post) {
+     filteredPost = post.petImages.filter((img) => img != imageUrl);
+      post.petImages = filteredPost
+    }
+    console.log("finddd=>",post)
+
+    await post.save();
+   
+    res.status(200).json(customizeResponse(true, "Image Deleted successfully", post));
+  } catch (error) {
+    logger.error("Error while deleting the images:", error);
+    res
+      .status(500)
+      .json(customizeResponse(false, "Error while deleting the images:", error));
+  }
+};
+
+exports.deletePost = async (req, res) => {
+  try {
+    let {postId} = req.params;
+    let post = await postModel.findById(postId);
+    if(post) {
+    let deleteImage = await post.petImages.map(async (img) => {
+      return await deleteOnCloudinary(img)
+    });
+    await Promise.all(deleteImage);
+    let deletedPost = await postModel.findByIdAndDelete(postId);
+
+    res.status(200).json(customizeResponse(true, "Post deleteted successfully", deletedPost))
+    }
+    console.log("#################")
+  } catch (error) {
+    logger.error("Error while deleting a post", error);
+    res
+      .status(500)
+      .json(customizeResponse(false, "Error while deleting a post:", error));
+  }
+}

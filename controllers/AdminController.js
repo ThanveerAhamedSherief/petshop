@@ -33,6 +33,8 @@ const getCreatedPosts = async (req, res) => {
     let { page } = req.query;
     page = parseInt(page)
     let posts = await postModel.find({ status: "Draft" }).limit(limit).skip((page - 1) * limit);
+    let countedPosts = await postModel.find({ status: "Draft" }).countDocuments();
+    posts.noOfDocuments = countedPosts;
     // console.log("posts", posts);
     res
       .status(200)
@@ -46,4 +48,22 @@ const getCreatedPosts = async (req, res) => {
   }
 };
 
-module.exports = { enablePostsToPublic, getCreatedPosts };
+const getNoOfDocuments = async (req, res) => {
+  try {
+
+    let countedPosts = await postModel.find({ status: "Draft" });
+    
+    // console.log("posts", posts);
+    res
+      .status(200)
+      .json(customizeResponse(true, "All not approved posts", countedPosts));
+  } catch (error) {
+    console.log("Error while gettting no of documents", error)
+    logger.error("Error while gettting no of documents", error);
+    res
+      .status(500)
+      .json(customizeResponse(false, "Error while gettting no of documents", error));
+  }
+};
+
+module.exports = { enablePostsToPublic, getCreatedPosts, getNoOfDocuments };
