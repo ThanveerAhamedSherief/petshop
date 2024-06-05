@@ -4,7 +4,7 @@ const getLatLngFromPincode = async (pincode, apiKey) => {
   const url = `https://us1.locationiq.com/v1/search.php?key=${apiKey}&q=${pincode}&format=json`;
 
   try {
-    console.log("url==>", url)
+    console.log("pincode==>", pincode)
     const response = await axios.get(url);
     const data = response.data;
 
