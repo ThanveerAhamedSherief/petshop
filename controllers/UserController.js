@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const { uploadOnCloudinary, deleteOnCloudinary } = require("../utils/cloudinary");
 const { postModel } = require("../models/postModel");
-const { getLatLngFromPincode } = require("../utils/geoCode");
+const { getLatLngFromPincode, getAddressFromLatLng } = require("../utils/geoCode");
 
 exports.registerUser = async (req, res) => {
   try {
@@ -19,16 +19,13 @@ exports.registerUser = async (req, res) => {
       gender,
       phoneNumber,
       isActive,
-      city,
-      state,
-      country,
+
       pincode,
-      // latitude,
-      // longtitude,
+
       dob,
       userType,
     } = req.body;
-    let latitude,longtitude;
+    let latitude,longtitude, city, country, state, displayAddress;
     console.log("files==>", req.file);
     let avatar;
     if (req.file) {
@@ -36,11 +33,21 @@ exports.registerUser = async (req, res) => {
       avatar = await uploadOnCloudinary(avatarLocalPath);
     }
     //  avatar = await uploadOnCloudinary(avatarLocalPath);
+    let address;
     let getLatAndLang = await getLatLngFromPincode(pincode, geo_code_key);
     if (getLatAndLang) {
       latitude = getLatAndLang.lat;
-      longtitude = getLatAndLang.lon
+      longtitude = getLatAndLang.lon;
+      address = await getAddressFromLatLng(latitude, longtitude, geo_code_key);
+      if(address) {
+        city = address.address['state_district'];
+        state = address.address['state'];
+        country = address.address['country'];
+        displayAddress = address.display_name;
+      }
     }
+
+    console.log("address==>", address?.display_name);
 
     if (!(email && password && name)) {
       return res
@@ -70,6 +77,7 @@ exports.registerUser = async (req, res) => {
       profilePic: avatar?.url ? avatar.url : "",
       dob,
       userType,
+      displayAddress
     });
     let token = await createUser.generateToken();
     let response = {
@@ -77,6 +85,8 @@ exports.registerUser = async (req, res) => {
       name: createUser.name,
       _id: createUser.id,
       token,
+      address: address.address,
+      displayAddress
     };
     res
       .status(201)

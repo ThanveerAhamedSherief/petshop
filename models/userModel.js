@@ -64,7 +64,8 @@ const userSchema = new Schema(
     userType:{
       type: String,
       required: true
-    }
+    },
+    displayAddress: String
   },
   {
     timestamps: true,
