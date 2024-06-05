@@ -1,4 +1,4 @@
-const { secretkey, limit } = require("../config/config");
+const { secretkey, limit, geo_code_key } = require("../config/config");
 const { gfs } = require("../db/connection");
 const { User } = require("../models/userModel");
 const { customizeResponse } = require("../utils/customResponse");
@@ -8,6 +8,7 @@ const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const { uploadOnCloudinary, deleteOnCloudinary } = require("../utils/cloudinary");
 const { postModel } = require("../models/postModel");
+const { getLatLngFromPincode } = require("../utils/geoCode");
 
 exports.registerUser = async (req, res) => {
   try {
@@ -22,11 +23,12 @@ exports.registerUser = async (req, res) => {
       state,
       country,
       pincode,
-      latitude,
-      longtitude,
+      // latitude,
+      // longtitude,
       dob,
       userType,
     } = req.body;
+    let latitude,longtitude;
     console.log("files==>", req.file);
     let avatar;
     if (req.file) {
@@ -34,6 +36,11 @@ exports.registerUser = async (req, res) => {
       avatar = await uploadOnCloudinary(avatarLocalPath);
     }
     //  avatar = await uploadOnCloudinary(avatarLocalPath);
+    let getLatAndLang = await getLatLngFromPincode(pincode, geo_code_key);
+    if (getLatAndLang) {
+      latitude = getLatAndLang.lat;
+      longtitude = getLatAndLang.lon
+    }
 
     if (!(email && password && name)) {
       return res
@@ -65,7 +72,6 @@ exports.registerUser = async (req, res) => {
       userType,
     });
     let token = await createUser.generateToken();
-    console.log("Token==>", token);
     let response = {
       email: createUser.email,
       name: createUser.name,
@@ -192,7 +198,39 @@ exports.updateUser = async (req, res) => {
   }
 };
 
+exports.deleteUser = async (req, res) => {
+  try {
+    let { userId } = req.params;
+    console.log("userId id from params", userId)
+    let user = await User.findById(userId);
 
+    if(user) {
+      await deleteOnCloudinary(user.profilePic);
+
+    }
+    let userPostedPost = await postModel.find({ownerId: user._id});
+     console.log("userPosted posts====>", userPostedPost);
+
+     userPostedPost.forEach(async (eachPost) => {
+      
+     });
+    // let avatar;
+    // if (req.file) {
+    //   const avatarLocalPath = req.file.path;
+    //   avatar = await uploadOnCloudinary(avatarLocalPath);
+    // }
+    if(req.file && avatar?.url) {
+      req.body.profilePic = avatar?.url;
+    }
+    let updatedUser = await User.findByIdAndUpdate(userId, req.body, { new: true} );
+    res.status(200).json(customizeResponse(true, "User updated successfully", updatedUser));
+  } catch (error) {
+    logger.error("Error while deleting an user", error);
+    res
+      .status(500)
+      .json(customizeResponse(false, "Error while deleting an user", error));
+  }
+};
 
 
 
