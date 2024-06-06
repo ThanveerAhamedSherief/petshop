@@ -1,13 +1,11 @@
 const axios = require('axios');
 
-const getLatLngFromPincode = async (pincode, apiKey) => {
-  const url = `https://us1.locationiq.com/v1/search.php?key=${apiKey}&q=${pincode}&format=json`;
+const getCoordinatesFromPincode = async (pincode, apiKey) => {
+  const url = `https://us1.locationiq.com/v1/search.php?key=${apiKey}&q=${pincode}&countrycodes=IN&format=json`;
 
   try {
-    console.log("pincode==>", pincode)
     const response = await axios.get(url);
     const data = response.data;
-
 
     if (data.length > 0) {
       const location = {
@@ -16,10 +14,12 @@ const getLatLngFromPincode = async (pincode, apiKey) => {
       };
       return location;
     } else {
-        return null
+      // throw new Error('No results found');
+      return null;
     }
   } catch (error) {
-    console.error('Error fetching geolocation:', error.message);
+    console.error('Error fetching coordinates:', error.message);
+    return null;
   }
 };
 
@@ -42,4 +42,4 @@ const getAddressFromLatLng = async (lat, lng, apiKey) => {
     }
   };
   
-module.exports = {getLatLngFromPincode, getAddressFromLatLng};      
+module.exports = {getCoordinatesFromPincode, getAddressFromLatLng};      

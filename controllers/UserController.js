@@ -8,7 +8,7 @@ const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const { uploadOnCloudinary, deleteOnCloudinary } = require("../utils/cloudinary");
 const { postModel } = require("../models/postModel");
-const { getLatLngFromPincode, getAddressFromLatLng } = require("../utils/geoCode");
+const { getAddressFromLatLng, getCoordinatesFromPincode } = require("../utils/geoCode");
 
 exports.registerUser = async (req, res) => {
   try {
@@ -34,7 +34,7 @@ exports.registerUser = async (req, res) => {
     }
     //  avatar = await uploadOnCloudinary(avatarLocalPath);
     let address;
-    let getLatAndLang = await getLatLngFromPincode(pincode, geo_code_key);
+    let getLatAndLang = await getCoordinatesFromPincode(pincode, geo_code_key);
     if (getLatAndLang) {
       latitude = getLatAndLang.lat;
       longtitude = getLatAndLang.lon;
@@ -85,7 +85,7 @@ exports.registerUser = async (req, res) => {
       name: createUser.name,
       _id: createUser.id,
       token,
-      address: address.address,
+      address: address ? address.address : {},
       displayAddress
     };
     res
