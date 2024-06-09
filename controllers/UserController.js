@@ -19,9 +19,7 @@ exports.registerUser = async (req, res) => {
       gender,
       phoneNumber,
       isActive,
-
       pincode,
-
       dob,
       userType,
     } = req.body;
@@ -86,11 +84,13 @@ exports.registerUser = async (req, res) => {
       _id: createUser.id,
       token,
       address: address ? address.address : {},
-      displayAddress
+      displayAddress,
+      latitude,
+      longtitude
     };
     res
       .status(201)
-      .json(customizeResponse(true, "New user created successfully", response));
+      .json(customizeResponse(true, "New user created successfully", createUser));
   } catch (error) {
     console.log("Error from register", error);
     logger.error("Error while registering a user", error);
