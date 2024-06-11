@@ -9,18 +9,18 @@ const path = require('path');
 // admin.initializeApp({
 //   credential: admin.credential.cert(serviceAccount)
 // });
+const serviceAccount = require('../config/service.json');
 
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
 const deviceToken = require('../models/deviceTokenModel');
 
 
 
 async function sendNotificationsToAdmin(message) {
   try {
-    const serviceAccount = require('../config/service.json');
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
     const devices = await deviceToken.find({role: 'admin'});
     const tokens = devices.map(device => device.fcmToken);
 
