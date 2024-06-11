@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "pettobazaar-27766",
+  "private_key_id": "4ffb689c57ccb70ca7142144d2b1dec66b6e290b",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCsBEKIKVPDvkNc\nBA3FykNH3Gh2dWClnCsHnuNTvxnBXOMCkQgrv6f3Dt0pm8yiEObF95foeg12MTG0\nZ5C3AIStDntHejzE0evzNcA1vbfceoq5nl3bjANjxgtg1AxO7qRu3oUm46SzuQRy\nFlCEEFC08q6KHyqiPpQcPS6KSZq+K6QCQUW8Xg8Xl8XwqX+FYnDHCTWAOcbWwLrW\n8fA1V1H4Oohpn9yNwsEKi826BotOs/kmi3iBJ1Pc9jpN7luoG/INTli10i+ZBvdm\n1nAh0hzB6dQMUHdC737o4tTNlboempEeMB25A2OJl2i8ATyPC/1jgfu1WLcelKNV\n/vzMT2A5AgMBAAECggEAEiOJ239WIqY5xqZzyFdVhGqgxlsGw7flzrIpwQ89+Uag\n9oiSHsDhRptV5XkVGULkftwms+BI8p1p4x7novCGTRRhmg4xAcUsFxOkLtaQYIq4\nfa3OMmQ/iEIeOYnquVkPVFSZIFpxZ/U624fwWhi5VfdgQdbbAUxNhHPMKE9uJp7Z\nSN+x2wNdDVJ7iTfJyQOjHNhYB4e5m4pSgSQmVMEPoXL75/QrifBSWt33Qe1QYZDf\nYKxC5g8i0Ru7hYWxUiOtxgZlElg5Krpl2ElPowxvoRM7CKSkTPrA3eZNsWfbnHLD\n2jaROb89R+p9zwb2aPW3cKRIBQ8mcOrx3ovdte5yjQKBgQDw7MjLOhkSU84MHHJK\nkoeM21KMEb9+eFtdROoc7/c7YDqpkCXREFele9VopeQg4633mbdF1WCgqe1bZVGM\nmnASz3k5a5uih670/Xz0sCDgwAqa4gckN25a9o/5Z+Ynmp9i68Pn6PmE21WYQQaV\nUYhHGM8+safoD0MMMM0liz0wtQKBgQC2x632Ed7kdQzdGLAxCeFu31oOoWTk4yBS\n1p7fRHjF3aWQMH+43B3Z78+NW8F/dD9JemT9b8E43NUBM6L93UhzKwuLj1Nl/2co\nWMRF2zVtepMtgEbmbZ8+gFMTawlpenAPkmWQKPHfrNR/zsVxOWEirYEQ4yjzbyxx\nhLjFuxGX9QKBgQDbG10ZhkLa6iCP3ycKLuzb63LNNC7lg+wDjPMlUg+UjlWLdC8Q\nTT6In3BcddJdHvNOJRwKhJ4WP7Q/1Isvxhx63vkugXDPhXpWEFsd5ThhbgW3CizY\ngRj53RbfCeDEz9h4jFZkiPq0Gw1jJHAqSDYaArQoHkXHxGmDorZPmKwTqQKBgCaB\n1O2FgE7jNg2SePQr37mLBp8Uc3whOZsaKihhdYxCEPJatV3NyeAzPKfMT+y5Iegq\nCAK4u51uMNXq+gi/yNayl+EUFf7kGuiOIvOQpiXlcAJjBwzexXDWeioaH8aADAHL\n1ufTKHn2IGK4vjIHY6Z5pTpYkTUQE+3qhz7pFWDNAoGAZkVWOX2eIx2ZcHX9xitf\nB1rZ/hV5qgflsfitY32F4P5VzPVWfy7bWV40k0NwkIVCoVpXheVddnzB1XaFhhyv\nrSFQDPxcYZNXP2MOlti40NdLqbtUwrLfLWYyJ9Mb4zQaILFl8rGunq1qFE3LAN05\nO+s3K40NVr1qBSdQgI3kUjk=\n-----END PRIVATE KEY-----\n",
+  "client_email": "firebase-adminsdk-zpp0s@pettobazaar-27766.iam.gserviceaccount.com",
+  "client_id": "104849746753481653352",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-zpp0s%40pettobazaar-27766.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

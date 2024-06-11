@@ -29,7 +29,7 @@ const postSchema = new Schema(
       type: String,
     },
     petDob: {
-      type: Date,
+      type: Number,
     },
     petColor: {
       type: String,
@@ -41,11 +41,10 @@ const postSchema = new Schema(
       type: String,
     },
     weight: {
-      type: Number,
+      type: String,
     },
     price: {
-      type: Number,
-      default: 0,
+      type: String,
     },
     whatsAppNumber: {
       type: Number,
