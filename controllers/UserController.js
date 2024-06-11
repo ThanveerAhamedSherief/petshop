@@ -9,6 +9,7 @@ const fs = require("fs");
 const { uploadOnCloudinary, deleteOnCloudinary } = require("../utils/cloudinary");
 const { postModel } = require("../models/postModel");
 const { getAddressFromLatLng, getCoordinatesFromPincode } = require("../utils/geoCode");
+const deviceToken = require("../models/deviceTokenModel");
 
 exports.registerUser = async (req, res) => {
   try {
@@ -22,6 +23,7 @@ exports.registerUser = async (req, res) => {
       pincode,
       dob,
       userType,
+      fcmToken
     } = req.body;
     let latitude,longtitude, city, country, state, displayAddress;
     console.log("files==>", req.file);
@@ -78,19 +80,14 @@ exports.registerUser = async (req, res) => {
       displayAddress
     });
     let token = await createUser.generateToken();
-    let response = {
-      email: createUser.email,
-      name: createUser.name,
-      _id: createUser.id,
-      token,
-      address: address ? address.address : {},
-      displayAddress,
-      latitude,
-      longtitude
-    };
+    await deviceToken.create({
+      fcmToken: fcmToken,
+      userId: createUser._id
+    })
+
     res
       .status(201)
-      .json(customizeResponse(true, "New user created successfully", createUser));
+      .json(customizeResponse(true, "New user created successfully", {...createUser._doc, token}));
   } catch (error) {
     console.log("Error from register", error);
     logger.error("Error while registering a user", error);
@@ -103,6 +100,7 @@ exports.registerUser = async (req, res) => {
 exports.findUser = async (req, res) => {
   try {
     let { email } = req.params;
+    let {fcmToken} = req.query;
     console.log("Params", req.params);
     let userExist = await User.findOne({ email });
 
@@ -111,13 +109,21 @@ exports.findUser = async (req, res) => {
         .status(200)
         .json(customizeResponse(false, "User doesn't exists", null));
     }
+
     let data = userExist
       ? {
           ...userExist._doc,
           token: await userExist.generateToken(),
         }
       : null;
-    console.log("data", data);
+    console.log("data", data._id,);
+    if(fcmToken) {
+      let updateToken = await deviceToken.findOneAndUpdate({userId: userExist._id},{ $set: { fcmToken: fcmToken }},{
+        new: true
+      });
+      console.log("fcmToken", updateToken)
+    }
+
     res
       .status(200)
       .json(customizeResponse(true, "User Fetch Api Successfull", data));

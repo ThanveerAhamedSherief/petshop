@@ -8,6 +8,7 @@ const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const { uploadOnCloudinary, deleteOnCloudinary } = require("../utils/cloudinary");
 const { postModel } = require("../models/postModel");
+const { sendNotificationsToAdmin } = require("../services/pushNotification");
 
 exports.createPost = async (req, res) => {
   try {
@@ -26,7 +27,7 @@ exports.createPost = async (req, res) => {
       whatsAppNumber,
       city,
     } = req.body;
-    const { ownerId } = req.params;
+    const { ownerId, username } = req.params;
     console.log("files==>", req.files);
     const avatarLocalPath = req.files?.images;
     let images = [];
@@ -66,6 +67,11 @@ exports.createPost = async (req, res) => {
         $push: { posts: createUser._id },
       }
     );
+    let message = {
+      title: `${username} posted a post`,
+      body: `${Description}`
+    }
+    await sendNotificationsToAdmin(message);
     res.status(201).json(customizeResponse(true, "Post created", createUser));
   } catch (error) {
     logger.error("Error while creating post ", error);
