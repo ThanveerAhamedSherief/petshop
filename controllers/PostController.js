@@ -220,4 +220,28 @@ exports.deletePost = async (req, res) => {
       .status(500)
       .json(customizeResponse(false, "Error while deleting a post:", error));
   }
-}
+};
+exports.updatePostStatus = async (req, res) => {
+  try {
+    let { status } = req.body;
+    let {postId} = req.params;
+
+    // let verifiedStatus = status === 'Approved' ? true : false;
+    console.log("PostId",postId, status)
+    let updatePost = await  postModel.findByIdAndUpdate(postId,{
+        $set:{
+            status
+        }
+    },{new: true}); 
+    res
+      .status(200)
+      .json(customizeResponse(true, "Post updated successfully", updatePost));
+
+
+  } catch (error) {
+    console.log("Error while updaing post status", error)
+    res
+    .status(500)
+    .json(customizeResponse(false, "Error while updaing post status", error));
+  }
+};

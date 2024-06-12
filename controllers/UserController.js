@@ -52,7 +52,12 @@ exports.registerUser = async (req, res) => {
     if (!(email && password && name)) {
       return res
         .status(401)
-        .json(customizeResponse(false, "All fields are mandatory..!"));
+        .json(customizeResponse(false, "All fields are mandatory..!",[]));
+    }
+    if (!fcmToken) {
+      return res
+        .status(401)
+        .json(customizeResponse(false, "Token is missing",[]));
     }
     let isExistingUser = await User.findOne({ email });
     if (isExistingUser) {
