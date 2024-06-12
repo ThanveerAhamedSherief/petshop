@@ -245,3 +245,31 @@ exports.updatePostStatus = async (req, res) => {
     .json(customizeResponse(false, "Error while updaing post status", error));
   }
 };
+
+exports.getListOfSoldPosts = async (req, res) => {
+  try {
+    let {page} = req.query;
+    let soldedPosts = await postModel
+      .find({
+        status: 'Sold'
+      })
+      .limit(limit)
+      .skip(parseInt(page - 1) * limit);
+
+    res
+      .status(200)
+      .json(
+        customizeResponse(
+          true,
+          "Fetched All Solded products",
+          soldedPosts
+        )
+      );
+  } catch (error) {
+    console.log("Error from all sold fetch", error);
+    logger.error("Error from all sold fetch", error);
+    res
+      .status(500)
+      .json(customizeResponse(false, "Error from all sold fetch", error));
+  }
+}
