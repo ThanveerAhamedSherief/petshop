@@ -1,7 +1,10 @@
 const { limit } = require("../config/config");
 const { postModel } = require("../models/postModel");
+const { User } = require("../models/userModel");
 const { customizeResponse } = require("../utils/customResponse");
 const logger = require("../utils/logGenerator");
+const bcrypt = require("bcrypt");
+
 
 const enablePostsToPublic = async (req, res) => {
   try {
@@ -66,4 +69,35 @@ const getNoOfDocuments = async (req, res) => {
   }
 };
 
-module.exports = { enablePostsToPublic, getCreatedPosts, getNoOfDocuments };
+const adminLogin = async(req, res) => {
+  try {
+    let {email, password} = req.body;
+    let user = await User.find({email});
+    if(user.length === 0) {
+      return res.status(400).json(customizeResponse(false, "Email or Password incorrect"));
+    };
+
+    console.log("admin user==>", user)
+   const compare = await bcrypt.compare(password, user[0].password);
+
+   if(!compare) {
+   return res.status(400).json(customizeResponse(false, "Email or Password incorrect"));
+   }
+
+   if(compare && user[0].role === 'admin') {
+    res.status(200).json(customizeResponse(true, "Login Successfull..!"));
+   } else {
+    res.status(401).json(customizeResponse(false, "Un-Authorized user"));
+   }
+
+  } catch (error) {
+    console.log("Error while doing admin login", error)
+    logger.error("Error while doing admin login", error);
+    res
+      .status(500)
+      .json(customizeResponse(false, "Error while doing admin login", error));
+    
+  }
+}
+
+module.exports = { enablePostsToPublic, getCreatedPosts, getNoOfDocuments, adminLogin};
