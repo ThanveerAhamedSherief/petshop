@@ -227,26 +227,28 @@ exports.deleteUser = async (req, res) => {
 
     if(user) {
       await deleteOnCloudinary(user.profilePic);
-
+    }
+    else {
+      return res
+        .status(200)
+        .json(customizeResponse(false, "User doesn't exists", null));
     }
     let userPostedPost = await postModel.find({ownerId: user._id});
-     console.log("userPosted posts====>", userPostedPost);
+      let images = [];
+     if(userPostedPost.length > 0) {
+      let deletedPost = await Promise.all(userPostedPost.map( async (each) => {
+        images.push(...each.petImages);
+       return await postModel.deleteOne({_id: each})
 
-     userPostedPost.forEach(async (eachPost) => {
-      
-     });
-    // let avatar;
-    // if (req.file) {
-    //   const avatarLocalPath = req.file.path;
-    //   avatar = await uploadOnCloudinary(avatarLocalPath);
-    // }
-    if(req.file && avatar?.url) {
-      req.body.profilePic = avatar?.url;
-    }
-    let updatedUser = await User.findByIdAndUpdate(userId, req.body, { new: true} );
-    res.status(200).json(customizeResponse(true, "User updated successfully", updatedUser));
+      }));
+      console.log("Length of images array", images.length)
+      await User.deleteOne({_id: userId});
+      let deletedOn = await Promise.all(images.map(async (img) => await deleteOnCloudinary(img)))
+     }
+    res.status(200).json(customizeResponse(true, "User Deleted successfully"));
   } catch (error) {
     logger.error("Error while deleting an user", error);
+    console.log("Error while deleting an user", error);
     res
       .status(500)
       .json(customizeResponse(false, "Error while deleting an user", error));

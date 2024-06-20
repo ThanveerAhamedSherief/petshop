@@ -1,5 +1,5 @@
 const express = require("express");
-const { registerUser, findUser, fetchUserPosts, updateUser } = require("../controllers/UserController");
+const { registerUser, findUser, fetchUserPosts, updateUser, deleteUser } = require("../controllers/UserController");
 const { upload } = require("../services/imageUploader");
 const { authenticateUserToken } = require("../services/authMiddleware");
 const { updatePosts, updatePostStatus } = require("../controllers/PostController");
@@ -22,6 +22,7 @@ userRouter.get("/details/:email", findUser);
 userRouter.route('/:userId/getUserProfile').get(fetchUserPosts);
 userRouter.route('/:userId/updateProfile').put(upload.single("avatar"), updateUser);
 userRouter.route('/:postId/updatePostStatus').put(updatePostStatus);
+userRouter.route('/deleteUser/:userId').delete(deleteUser)
 
 // userRouter.route("/register").post(upload.single("avatar"), registerUser);
 // userRouter.get("/details/:email", findUser);
