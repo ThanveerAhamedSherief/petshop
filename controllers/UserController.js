@@ -65,7 +65,7 @@ exports.registerUser = async (req, res) => {
         .status(401)
         .json(customizeResponse(false, "User already exists", []));
     }
-
+   if(getLatAndLang) {
     const createUser = await User.create({
       name,
       email,
@@ -89,6 +89,12 @@ exports.registerUser = async (req, res) => {
       fcmToken: fcmToken,
       userId: createUser._id
     })
+   } else {
+   return res
+      .status(400)
+      .json(customizeResponse(false, "There's issue in your pincode please provide valid code"));
+   }
+
 
     res
       .status(201)
