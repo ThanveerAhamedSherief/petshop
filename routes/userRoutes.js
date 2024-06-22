@@ -19,9 +19,9 @@ userRouter.get("/", (req, res) => {
 //     );
 userRouter.route("/register").post(upload.single("avatar"), registerUser);
 userRouter.get("/details/:email", findUser);
-userRouter.route('/:userId/getUserProfile').get(fetchUserPosts);
-userRouter.route('/:userId/updateProfile').put(upload.single("avatar"), updateUser);
-userRouter.route('/:postId/updatePostStatus').put(updatePostStatus);
+userRouter.route('/:userId/getUserProfile').get(authenticateUserToken, fetchUserPosts);
+userRouter.route('/:userId/updateProfile').put(authenticateUserToken, upload.single("avatar"), updateUser);
+userRouter.route('/:postId/updatePostStatus').put(authenticateUserToken,updatePostStatus);
 userRouter.route('/deleteUser/:userId').delete(deleteUser)
 
 // userRouter.route("/register").post(upload.single("avatar"), registerUser);

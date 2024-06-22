@@ -32,7 +32,7 @@ function authenticateUserToken(req, res, next) {
   }
   try {
     const decodedToken = jwt.verify(token, secretkey);
-    console.log("token==>", decodedToken)
+    console.log("<=====token decoded==>", )
 
     if (decodedToken["role"] === "user") {
       req.user = decodedToken;

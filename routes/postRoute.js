@@ -17,13 +17,13 @@ postRouter.route('/:ownerId/:username/createPost').post(
     createPost
     );
     
-postRouter.route('/getNearByPosts').get(findNearBy);
-postRouter.route('/:postId/updatePost').put( upload.fields([
+postRouter.route('/getNearByPosts').get(authenticateUserToken, findNearBy);
+postRouter.route('/:postId/updatePost').put(authenticateUserToken, upload.fields([
     { name: 'images', maxCount: 5}
 ]),updatePosts);
-postRouter.route('/:postId').delete(deleteImages);
-postRouter.route('/deletePost/:postId').delete(deletePost);
-postRouter.route('/soldPosts').get(getListOfSoldPosts);
+postRouter.route('/:postId').delete(authenticateUserToken, deleteImages);
+postRouter.route('/deletePost/:postId').delete(authenticateUserToken, deletePost);
+postRouter.route('/soldPosts').get(authenticateUserToken, getListOfSoldPosts);
 // postRouter.route('/:ownerId/createPost').post(
 //     authenticateUserToken,
 //     upload.fields([
