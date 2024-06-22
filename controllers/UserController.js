@@ -88,18 +88,21 @@ exports.registerUser = async (req, res) => {
     await deviceToken.create({
       fcmToken: fcmToken,
       userId: createUser._id
-    })
+    });
+    res
+    .status(201)
+    .json(customizeResponse(true, "New user created successfully", {...createUser._doc, token}));
    } else {
    return res
       .status(400)
       .json(customizeResponse(false, "There's issue in your pincode please provide valid code"));
    }
 
-
-    res
-      .status(201)
-      .json(customizeResponse(true, "New user created successfully", {...createUser._doc, token}));
   } catch (error) {
+    let errorUser = await User.findOne({email});
+    if(errorUser) {
+      await User.deleteOne({_id: errorUser._id})
+    }
     console.log("Error from register", error);
     logger.error("Error while registering a user", error);
     res
