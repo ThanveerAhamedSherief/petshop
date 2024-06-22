@@ -245,15 +245,15 @@ exports.deleteUser = async (req, res) => {
     let userPostedPost = await postModel.find({ownerId: user._id});
       let images = [];
      if(userPostedPost.length > 0) {
-      let deletedPost = await Promise.all(userPostedPost.map( async (each) => {
+       await Promise.all(userPostedPost.map( async (each) => {
         images.push(...each.petImages);
        return await postModel.deleteOne({_id: each})
 
       }));
       console.log("Length of images array", images.length)
-      await User.deleteOne({_id: userId});
-      let deletedOn = await Promise.all(images.map(async (img) => await deleteOnCloudinary(img)))
+      await Promise.all(images.map(async (img) => await deleteOnCloudinary(img)))
      }
+    await User.deleteOne({_id: userId});
     res.status(200).json(customizeResponse(true, "User Deleted successfully"));
   } catch (error) {
     logger.error("Error while deleting an user", error);
