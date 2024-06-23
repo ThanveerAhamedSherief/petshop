@@ -24,12 +24,12 @@ function authenticateAdminToken(req, res, next) {
 }
 function authenticateUserToken(req, res, next) {
   let token = req.header("Authorization");
-  token = token.slice(7);
   if (!token) {
     return res
       .status(401)
       .json(customizeResponse(false, "Authorization token is missing."));
   }
+  token = token.slice(7);
   try {
     const decodedToken = jwt.verify(token, secretkey);
     console.log("<=====token decoded==>", )
