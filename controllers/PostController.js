@@ -164,7 +164,7 @@ exports.updatePosts = async (req, res) => {
     if(req.files && images.length > 0) {
       req.body.petImages = images;
     }
-    console.log("Post id from params", postId)
+    console.log("Post id from params", req.body)
     let updatedPosts = await postModel.findByIdAndUpdate(postId, req.body, { new: true} );
     res.status(200).json(customizeResponse(true, "Post updated successfully", updatedPosts));
   } catch (error) {
