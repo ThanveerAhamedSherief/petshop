@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const trackSchema = new mongoose.Schema({
   requesterId: String,
   requestedPostId: String,
-  requesterWhatappNumber: String,
+  requesterWhatappNumber: Number,
   requestedPetname: String,
   requestedMode: String,
   requestedDateAndTime: Number,
