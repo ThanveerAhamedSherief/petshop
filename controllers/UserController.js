@@ -51,19 +51,19 @@ exports.registerUser = async (req, res) => {
 
     if (!(email && password && name)) {
       return res
-        .status(401)
-        .json(customizeResponse(false, "All fields are mandatory..!",[]));
+        .status(200)
+        .json(customizeResponse(false,"PB_ERROR_CODE_14", "All fields are mandatory..!",[]));
     }
     if (!fcmToken) {
       return res
-        .status(401)
-        .json(customizeResponse(false, "Token is missing",[]));
+        .status(200)
+        .json(customizeResponse(false,"PB_ERROR_CODE_15", "Token is missing",[]));
     }
     let isExistingUser = await User.findOne({ email });
     if (isExistingUser) {
       return res
-        .status(401)
-        .json(customizeResponse(false, "User already exists", []));
+        .status(200)
+        .json(customizeResponse(false,"PB_ERROR_CODE_16", "User already exists", []));
     }
    if(getLatAndLang) {
     const createUser = await User.create({
@@ -91,11 +91,11 @@ exports.registerUser = async (req, res) => {
     });
     res
     .status(201)
-    .json(customizeResponse(true, "New user created successfully", {...createUser._doc, token}));
+    .json(customizeResponse(true,"PB_ERROR_CODE_01", "New user created successfully", {...createUser._doc, token}));
    } else {
    return res
-      .status(400)
-      .json(customizeResponse(false, "There's issue in your pincode please provide valid code"));
+      .status(200)
+      .json(customizeResponse(false,"PB_ERROR_CODE_11", "There's issue in your pincode please provide valid code"));
    }
 
   } catch (error) {
@@ -106,8 +106,8 @@ exports.registerUser = async (req, res) => {
     console.log("Error from register", error);
     logger.error("Error while registering a user", error);
     res
-      .status(400)
-      .json(customizeResponse(false, "Error while registering an user", error));
+      .status(200)
+      .json(customizeResponse(false,"PB_ERROR_CODE_10", "Error while registering an user", error));
   }
 };
 
@@ -121,7 +121,7 @@ exports.findUser = async (req, res) => {
     if (!userExist) {
       return res
         .status(200)
-        .json(customizeResponse(false, "User doesn't exists", null));
+        .json(customizeResponse(false,"PB_ERROR_CODE_17", "User doesn't exists", null));
     }
 
     let data = userExist
@@ -140,13 +140,10 @@ exports.findUser = async (req, res) => {
 
     res
       .status(200)
-      .json(customizeResponse(true, "User Fetch Api Successfull", data));
+      .json(customizeResponse(true,"PB_ERROR_CODE_01", "User Fetch Api Successfull", data));
   } catch (error) {
     console.log("Error", error);
-    res.status(500).json({
-      msg: "Error in Login",
-      error,
-    });
+    res.status(200).json(customizeResponse(false,"PB_ERROR_CODE_10","Error in Login", error));
   }
 };
 
@@ -166,6 +163,7 @@ exports.fetchUserPosts = async (req, res) => {
       .json(
         customizeResponse(
           true,
+          "PB_ERROR_CODE_01",
           "Fetched user details successfully",
           fetchedUserDetails
         )
@@ -175,7 +173,7 @@ exports.fetchUserPosts = async (req, res) => {
     logger.error("Error while fetchUserProfile", error);
     res
       .status(500)
-      .json(customizeResponse(false, "Error while fetchUserProfile", error));
+      .json(customizeResponse(false,"PB_ERROR_CODE_10", "Error while fetchUserProfile", error));
   }
 };
 
@@ -192,6 +190,7 @@ exports.fetchAllUser = async (req, res) => {
       .json(
         customizeResponse(
           true,
+          "PB_ERROR_CODE_01",
           "Fetched All user",
           fetchedUserDetails
         )
@@ -200,8 +199,8 @@ exports.fetchAllUser = async (req, res) => {
     console.log("Error from all user fetch", error);
     logger.error("Error from all user fetch", error);
     res
-      .status(500)
-      .json(customizeResponse(false, "Error from all user fetch", error));
+      .status(200)
+      .json(customizeResponse(false,"PB_ERROR_CODE_10", "Error from all user fetch", error));
   }
 };
 
@@ -219,12 +218,12 @@ exports.updateUser = async (req, res) => {
       req.body.profilePic = avatar?.url;
     }
     let updatedUser = await User.findByIdAndUpdate(userId, req.body, { new: true} );
-    res.status(200).json(customizeResponse(true, "User updated successfully", updatedUser));
+    res.status(200).json(customizeResponse(true,"PB_ERROR_CODE_01", "User updated successfully", updatedUser));
   } catch (error) {
     logger.error("Error while updating the user:", error);
     res
-      .status(500)
-      .json(customizeResponse(false, "Error while updating the user", error));
+      .status(200)
+      .json(customizeResponse(false,"PB_ERROR_CODE_10", "Error while updating the user", error));
   }
 };
 
@@ -240,7 +239,7 @@ exports.deleteUser = async (req, res) => {
     else {
       return res
         .status(200)
-        .json(customizeResponse(false, "User doesn't exists", null));
+        .json(customizeResponse(false,"PB_ERROR_CODE_17", "User doesn't exists", null));
     }
     let userPostedPost = await postModel.find({ownerId: user._id});
       let images = [];
@@ -254,13 +253,13 @@ exports.deleteUser = async (req, res) => {
       await Promise.all(images.map(async (img) => await deleteOnCloudinary(img)))
      }
     await User.deleteOne({_id: userId});
-    res.status(200).json(customizeResponse(true, "User Deleted successfully"));
+    res.status(200).json(customizeResponse(true,"PB_ERROR_CODE_01", "User Deleted successfully"));
   } catch (error) {
     logger.error("Error while deleting an user", error);
     console.log("Error while deleting an user", error);
     res
       .status(500)
-      .json(customizeResponse(false, "Error while deleting an user", error));
+      .json(customizeResponse(false,"PB_ERROR_CODE_10", "Error while deleting an user", error));
   }
 };
 

@@ -43,6 +43,7 @@ async function sendNotificationsToAdmin(message) {
     return true;
   } catch (error) {
     console.log('Error sending message:', error);
+    return false;
   }
 }
 

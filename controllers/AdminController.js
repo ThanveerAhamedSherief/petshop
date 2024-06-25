@@ -20,14 +20,14 @@ const enablePostsToPublic = async (req, res) => {
     },{new: true}); 
     res
       .status(200)
-      .json(customizeResponse(true, "Post updated successfully", updatePost));
+      .json(customizeResponse(true,"PB_ERROR_CODE_01", "Post updated successfully", updatePost));
 
 
   } catch (error) {
     console.log("Error while updaing post status", error)
     res
-    .status(500)
-    .json(customizeResponse(false, "Error while updaing post status", error));
+    .status(200)
+    .json(customizeResponse(false,"PB_ERROR_CODE_10" ,"Error while updaing post status", error));
   }
 };
 
@@ -41,13 +41,13 @@ const getCreatedPosts = async (req, res) => {
     // console.log("posts", posts);
     res
       .status(200)
-      .json(customizeResponse(true, "All not approved posts", posts));
+      .json(customizeResponse(true, "PB_ERROR_CODE_01","All not approved posts", posts));
   } catch (error) {
     console.log("Error while getCreatedPosts", error)
     logger.error("Error while getCreatedPosts", error);
     res
-      .status(500)
-      .json(customizeResponse(false, "Error while getCreatedPosts", error));
+      .status(200)
+      .json(customizeResponse(false,"PB_ERROR_CODE_10", "Error while getCreatedPosts", error));
   }
 };
 
@@ -59,13 +59,13 @@ const getNoOfDocuments = async (req, res) => {
     // console.log("posts", posts);
     res
       .status(200)
-      .json(customizeResponse(true, "All not approved posts", countedPosts));
+      .json(customizeResponse(true,"PB_ERROR_CODE_01", "All not approved posts", countedPosts));
   } catch (error) {
     console.log("Error while gettting no of documents", error)
     logger.error("Error while gettting no of documents", error);
     res
-      .status(500)
-      .json(customizeResponse(false, "Error while gettting no of documents", error));
+      .status(200)
+      .json(customizeResponse(false, "PB_ERROR_CODE_10","Error while gettting no of documents", error));
   }
 };
 
@@ -74,28 +74,28 @@ const adminLogin = async(req, res) => {
     let {email, password} = req.body;
     let user = await User.find({email});
     if(user.length === 0) {
-      return res.status(400).json(customizeResponse(false, "Email or Password incorrect"));
+      return res.status(200).json(customizeResponse(false,"PB_ERROR_CODE_13", "Email or Password incorrect"));
     };
 
     console.log("admin user==>", user)
    const compare = await bcrypt.compare(password, user[0].password);
 
    if(!compare) {
-   return res.status(400).json(customizeResponse(false, "Email or Password incorrect"));
+   return res.status(400).json(customizeResponse(false,"PB_ERROR_CODE_13", "Email or Password incorrect"));
    }
 
    if(compare && user[0].role === 'admin') {
-    res.status(200).json(customizeResponse(true, "Login Successfull..!"));
+    res.status(200).json(customizeResponse(true,"PB_ERROR_CODE_01", "Login Successfull..!"));
    } else {
-    res.status(401).json(customizeResponse(false, "Un-Authorized user"));
+    res.status(401).json(customizeResponse(false,"PB_ERROR_CODE_05", "Un-Authorized user"));
    }
 
   } catch (error) {
     console.log("Error while doing admin login", error)
     logger.error("Error while doing admin login", error);
     res
-      .status(500)
-      .json(customizeResponse(false, "Error while doing admin login", error));
+      .status(200)
+      .json(customizeResponse(false, "PB_ERROR_CODE_10","Error while doing admin login", error));
     
   }
 }

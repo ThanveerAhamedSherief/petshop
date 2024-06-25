@@ -7,8 +7,8 @@ function authenticateAdminToken(req, res, next) {
   token = token.slice(7);
   if (!token) {
     return res
-      .status(401)
-      .json(customizeResponse(false, "Authorization token is missing."));
+      .status(200)
+      .json(customizeResponse(false,"PB_ERROR_CODE_12", "Authorization token is missing."));
   }
   try {
     const decodedToken = jwt.verify(token, secretkey);
@@ -16,18 +16,18 @@ function authenticateAdminToken(req, res, next) {
       req.user = decodedToken;
       next();
     } else {
-      return res.status(403).json(customizeResponse(false, "Access forbidden"));
+      return res.status(200).json(customizeResponse(false,"PB_ERROR_CODE_05", "Access forbidden"));
     }
   } catch (error) {
-    return res.status(401).json(customizeResponse(false, "Invalid token."));
+    return res.status(200).json(customizeResponse(false,"PB_ERROR_CODE_12", "Invalid token."));
   }
 }
 function authenticateUserToken(req, res, next) {
   let token = req.header("Authorization");
   if (!token) {
     return res
-      .status(401)
-      .json(customizeResponse(false, "Authorization token is missing."));
+      .status(200)
+      .json(customizeResponse(false,"PB_ERROR_CODE_12", "Authorization token is missing."));
   }
   token = token.slice(7);
   try {
@@ -38,10 +38,10 @@ function authenticateUserToken(req, res, next) {
       req.user = decodedToken;
       next();
     } else {
-      return res.status(403).json(customizeResponse(false, "Access forbidden"));
+      return res.status(200).json(customizeResponse(false,"PB_ERROR_CODE_05", "Access forbidden"));
     }
   } catch (error) {
-    return res.status(401).json(customizeResponse(false, "Invalid token."));
+    return res.status(200).json(customizeResponse(false,"PB_ERROR_CODE_12", "Invalid token."));
   }
 }
 module.exports = {authenticateAdminToken, authenticateUserToken};

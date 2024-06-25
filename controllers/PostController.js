@@ -72,12 +72,12 @@ exports.createPost = async (req, res) => {
       body: `${Description}`
     }
     await sendNotificationsToAdmin(message);
-    res.status(201).json(customizeResponse(true, "Post created", createUser));
+    res.status(201).json(customizeResponse(true,"PB_ERROR_CODE_01", "Post created", createUser));
   } catch (error) {
     logger.error("Error while creating post ", error);
     res
       .status(500)
-      .json(customizeResponse(false, "Error while creating post", error));
+      .json(customizeResponse(false,"PB_ERROR_CODE_10", "Error while creating post", error));
   }
 };
 
@@ -140,7 +140,7 @@ exports.findNearBy = async (req, res) => {
       .then((nearbyLocations) => {
         res
           .status(200)
-          .json(customizeResponse(true, "Post created", nearbyLocations));
+          .json(customizeResponse(true,"PB_ERROR_CODE_01", "Post created", nearbyLocations));
       })
       .catch((error) => {
         console.error("Error finding nearby locations:", error);
@@ -148,8 +148,8 @@ exports.findNearBy = async (req, res) => {
   } catch (error) {
     logger.error("Error finding nearby locations:", error);
     res
-      .status(500)
-      .json(customizeResponse(false, "Error finding nearby locations:", error));
+      .status(200)
+      .json(customizeResponse(false,"PB_ERROR_CODE_10", "Error finding nearby locations:", error));
   }
 };
 
@@ -166,12 +166,12 @@ exports.updatePosts = async (req, res) => {
     }
     console.log("Post id from params", req.body)
     let updatedPosts = await postModel.findByIdAndUpdate(postId, req.body, { new: true} );
-    res.status(200).json(customizeResponse(true, "Post updated successfully", updatedPosts));
+    res.status(200).json(customizeResponse(true,"PB_ERROR_CODE_01", "Post updated successfully", updatedPosts));
   } catch (error) {
     logger.error("Error while updating the posts:", error);
     res
-      .status(500)
-      .json(customizeResponse(false, "Error while updating the posts", error));
+      .status(200)
+      .json(customizeResponse(false,"PB_ERROR_CODE_10", "Error while updating the posts", error));
   }
 };
 
@@ -191,12 +191,12 @@ exports.deleteImages = async (req, res) => {
 
     await post.save();
    
-    res.status(200).json(customizeResponse(true, "Image Deleted successfully", post));
+    res.status(200).json(customizeResponse(true,"PB_ERROR_CODE_01", "Image Deleted successfully", post));
   } catch (error) {
     logger.error("Error while deleting the images:", error);
     res
-      .status(500)
-      .json(customizeResponse(false, "Error while deleting the images:", error));
+      .status(200)
+      .json(customizeResponse(false,"PB_ERROR_CODE_10", "Error while deleting the images:", error));
   }
 };
 
@@ -211,14 +211,14 @@ exports.deletePost = async (req, res) => {
     await Promise.all(deleteImage);
     let deletedPost = await postModel.findByIdAndDelete(postId);
 
-    res.status(200).json(customizeResponse(true, "Post deleteted successfully", deletedPost))
+    res.status(200).json(customizeResponse(true,"PB_ERROR_CODE_01", "Post deleteted successfully", deletedPost))
     }
     console.log("#################")
   } catch (error) {
     logger.error("Error while deleting a post", error);
     res
       .status(500)
-      .json(customizeResponse(false, "Error while deleting a post:", error));
+      .json(customizeResponse(false,"PB_ERROR_CODE_10", "Error while deleting a post:", error));
   }
 };
 exports.updatePostStatus = async (req, res) => {
@@ -235,14 +235,14 @@ exports.updatePostStatus = async (req, res) => {
     },{new: true}); 
     res
       .status(200)
-      .json(customizeResponse(true, "Post updated successfully", updatePost));
+      .json(customizeResponse(true,"PB_ERROR_CODE_01", "Post updated successfully", updatePost));
 
 
   } catch (error) {
     console.log("Error while updaing post status", error)
     res
     .status(500)
-    .json(customizeResponse(false, "Error while updaing post status", error));
+    .json(customizeResponse(false,"PB_ERROR_CODE_10", "Error while updaing post status", error));
   }
 };
 
@@ -261,6 +261,7 @@ exports.getListOfSoldPosts = async (req, res) => {
       .json(
         customizeResponse(
           true,
+          "PB_ERROR_CODE_01",
           "Fetched All Solded products",
           soldedPosts
         )
@@ -269,7 +270,7 @@ exports.getListOfSoldPosts = async (req, res) => {
     console.log("Error from all sold fetch", error);
     logger.error("Error from all sold fetch", error);
     res
-      .status(500)
-      .json(customizeResponse(false, "Error from all sold fetch", error));
+      .status(200)
+      .json(customizeResponse(false,"PB_ERROR_CODE_10", "Error from all sold fetch", error));
   }
 }
